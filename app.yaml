@@ -1,0 +1,37 @@
+service: dashboard
+runtime: php55
+env: standard
+# Remember - storing secrets in plaintext is potentially unsafe. Consider using
+# something like https://cloud.google.com/secret-manager/ to help keep secrets
+# secret.
+env_variables:
+  CLOUD_SQL_CONNECTION_NAME: bluefigrest:us-central1:bluefigdb
+  DB_USER: root
+  DB_PASS: Firas@1974
+  DB_NAME: BlueFigDb
+beta_settings:
+  cloud_sql_instances: bluefigrest:us-central1:bluefigdb
+runtime_config:
+  document_root: .
+# Defaults to "serve index.php" and "serve public/index.php". Can be used to
+# serve a custom PHP front controller (e.g. "serve backend/index.php") or to
+# run a long-running PHP script as a worker process (e.g. "php worker.php").
+#
+
+entrypoint: serve handler.php
+
+handlers:
+- url: /(.+\.(ico|jpg|png|gif))$
+  static_files: \1
+  upload: (.+\.(ico|jpg|png|gif))$
+  application_readable: true
+- url: /(.+\.(htm|html|css|js))$
+  static_files: \1
+  upload: (.+\.(htm|html|css|js))$
+  application_readable: true
+- url: /(.+\.php)$
+  script: \1
+  login: admin
+- url: /.*
+  script: index.php
+  login: admin
